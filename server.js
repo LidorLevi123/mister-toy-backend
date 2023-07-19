@@ -3,7 +3,8 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import path from 'path'
 
-import { __dirname } from 'path'
+import { dirname } from 'path'
+import { fileURLToPath } from 'url'
 
 import { toyService } from './services/toy.service.js'
 import { loggerService } from './services/logger.service.js'
@@ -14,6 +15,9 @@ const app = express()
 app.use(express.static('public'))
 app.use(cookieParser())
 app.use(express.json())
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 if (process.env.NODE_ENV === 'production') {
     // Express serve static files on production environment
