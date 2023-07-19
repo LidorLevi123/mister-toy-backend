@@ -3,6 +3,8 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import path from 'path'
 
+import { __dirname } from 'path'
+
 import { toyService } from './services/toy.service.js'
 import { loggerService } from './services/logger.service.js'
 
