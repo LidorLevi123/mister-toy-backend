@@ -10,21 +10,30 @@ export const toyService = {
     save
 }
 
-const PAGE_SIZE = 5
 const toys = utilService.readJsonFile('data/toy.json')
 
-function query(filterBy = { txt: '' }) {
-    // const regex = new RegExp(filterBy.txt, 'i')
-    // var toysToReturn = toys.filter(toy => regex.test(toy.vendor))
-    // if (filterBy.minSpeed) {
-    //     toysToReturn = toysToReturn.filter(toy => toy.speed >= filterBy.minSpeed)
-    // }
-    // if (filterBy.pageIdx !== undefined) {
-    //     const startIdx = filterBy.pageIdx * PAGE_SIZE
-    //     toysToReturn = toysToReturn.slice(startIdx, startIdx + PAGE_SIZE)
-    // }
-    // return Promise.resolve(toysToReturn)
-    return Promise.resolve(toys)
+function query(filterBy) {
+    if (!filterBy) return toys
+
+    // Filter
+    const regex = new RegExp(filterBy.name, 'i')
+    let filteredToys = toys.filter(toy => regex.test(toy.name))
+
+    if (filterBy.inStock !== null) {
+        filterBy.inStock = filterBy.inStock === 'true' ? true : false
+        filteredToys = toys.filter(toy => toy.inStock === filterBy.inStock)
+    }
+
+    // Sort
+    filterBy.isDescending = filterBy.isDescending === 'true' ? true : false
+    const desc = filterBy.isDescending ? -1 : 1
+    const { sortBy } = filterBy
+
+    if (sortBy === 'name') filteredToys.sort((t1, t2) => t1.name.localeCompare(t2.name) * desc)
+    else if (sortBy === 'price') filteredToys.sort((t1, t2) => (t1.price - t2.price) * desc)
+    else if (sortBy === 'createdAt') filteredToys.sort((t1, t2) => (t1.createdAt - t2.createdAt) * desc)
+
+    return Promise.resolve(filteredToys)
 }
 
 function getById(toyId) {
@@ -44,6 +53,7 @@ function save(toy) {
         toys[idx] = toy
     } else {
         toy._id = utilService.makeId()
+        toy.createdAt = Date.now()
         toys.unshift(toy)
     }
     return _saveToysToFile().then(() => toy)

@@ -35,15 +35,14 @@ if (process.env.NODE_ENV === 'production') {
 // Toy LIST
 app.get('/api/toy', (req, res) => {
     const filterBy = {
-        txt: req.query.txt || '',
-        minSpeed: req.query.minSpeed || 0,
-        pageIdx: req.query.pageIdx || undefined,
+        name: req.query.name || '',
+        inStock: req.query.inStock || null,
+        sortBy: req.query.sortBy || '',
+        isDescending: req.query.isDescending || true,
     }
-    toyService
-        .query(filterBy)
-        .then(toys => {
-            res.send(toys)
-        })
+    
+    toyService.query(filterBy)
+        .then(toys => res.send(toys))
         .catch(err => {
             loggerService.error('Cannot get toys', err)
             res.status(400).send('Cannot get toys')
@@ -53,11 +52,9 @@ app.get('/api/toy', (req, res) => {
 // Toy READ
 app.get('/api/toy/:toyId', (req, res) => {
     const { toyId } = req.params
-    toyService
-        .getById(toyId)
-        .then(toy => {
-            res.send(toy)
-        })
+
+    toyService.getById(toyId)
+        .then(toy => res.send(toy))
         .catch(err => {
             loggerService.error('Cannot get toy', err)
             res.status(400).send('Cannot get toy')
@@ -66,15 +63,16 @@ app.get('/api/toy/:toyId', (req, res) => {
 
 // Toy CREATE
 app.post('/api/toy', (req, res) => {
+    const { name, price, labels, inStock } = req.body
     const toy = {
-        vendor: req.body.vendor,
-        speed: +req.body.speed,
+        name,
+        price,
+        labels,
+        inStock
     }
-    toyService
-        .save(toy)
-        .then(savedToy => {
-            res.send(savedToy)
-        })
+
+    toyService.save(toy)
+        .then(savedToy => res.send(savedToy))
         .catch(err => {
             loggerService.error('Cannot save toy', err)
             res.status(400).send('Cannot save toy')
@@ -83,16 +81,17 @@ app.post('/api/toy', (req, res) => {
 
 // Toy UPDATE
 app.put('/api/toy/:id', (req, res) => {
+    const { _id, name, price, labels, inStock } = req.body
     const toy = {
-        _id: req.params.id,
-        vendor: req.body.vendor,
-        speed: +req.body.speed,
+        _id,
+        name,
+        price,
+        labels,
+        inStock
     }
-    toyService
-        .save(toy)
-        .then(savedToy => {
-            res.send(savedToy)
-        })
+
+    toyService.save(toy)
+        .then(savedToy => res.send(savedToy))
         .catch(err => {
             loggerService.error('Cannot save toy', err)
             res.status(400).send('Cannot save toy')
@@ -102,11 +101,10 @@ app.put('/api/toy/:id', (req, res) => {
 // Toy DELETE
 app.delete('/api/toy/:toyId', (req, res) => {
     const { toyId } = req.params
-    toyService
-        .remove(toyId)
+
+    toyService.remove(toyId)
         .then(() => {
             loggerService.info(`Toy ${toyId} removed`)
-
             res.send('Removed!')
         })
         .catch(err => {

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "baba": "dir",
-    "start": "nodemon --ignore \"./data\" server.js"
+    "dev": "nodemon --ignore \"./data\" server.js"
   },
   "author": "Me",
   "type": "module",
